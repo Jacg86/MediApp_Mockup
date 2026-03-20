@@ -1,27 +1,32 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Carrito | MediApp</title>
-<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito | MediApp</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 
 <body class="home-body">
 
 <nav class="main-nav">
-<div class="nav-container">
-
-<div class="nav-left">
-<a href="home.html" class="nav-logo">
-MediApp
-</a>
-</div>
-
-<div class="nav-right">
-<a href="perfil-persona.html" class="nav-link">Perfil</a>
-</div>
-
-</div>
+    <div class="nav-container">
+        <div class="nav-left">
+            <a href="home.html" class="nav-logo">
+                <svg viewBox="0 0 24 24" fill="none" class="logo-svg" stroke="#2de07b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>MediApp</span>
+            </a>
+        </div>
+        <div class="nav-right">
+            <a href="perfil-persona.html" class="nav-avatar-link"><div class="user-avatar"></div></a>
+        </div>
+    </div>
 </nav>
 
 <main class="home-main">
@@ -36,17 +41,17 @@ MediApp
 <div class="product-card">
 
 <div class="product-image-placeholder">
-Imagen medicamento
+<img class="product-image" src="img/acetaminofen.jpeg" alt="Acetaminofen" style="width:100%; height:100%; object-fit:cover;">
 </div>
 
 <div class="product-info">
 
-<div class="product-title">
+<div class="product-title" style="font-weight:700; font-size:18px;">
 Acetaminofen
 </div>
 
-<div class="store-info">
-Droguería Salud Total
+<div class="store-info" style="color:var(--text-muted); font-size:14px; margin-top:4px;">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px; vertical-align:-3px; margin-right:4px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>Droguería Salud Total
 </div>
 
 <div class="price-row">
@@ -64,8 +69,8 @@ Vence en 2 meses
 </div>
 
 <div class="load-more-container">
-<a href="domicilio.html">
-<button class="btn-load-more">
+<a href="domicilio.html" style="text-decoration:none;">
+<button class="btn-submit" style="width:auto; padding:0 40px;">
 Continuar compra
 </button>
 </a>
