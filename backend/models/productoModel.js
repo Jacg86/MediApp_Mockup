@@ -115,11 +115,11 @@ const ProductoModel = {
     },
 
     /**
-     * Soft-delete producto
+     * Eliminar producto de la base de datos
      */
     async delete(id) {
         const result = await query(
-            `UPDATE producto SET activo = FALSE WHERE id_producto = $1 RETURNING id_producto`,
+            `DELETE FROM producto WHERE id_producto = $1 RETURNING id_producto`,
             [id]
         );
         return result.rowCount > 0;

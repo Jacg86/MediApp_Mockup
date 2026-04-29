@@ -141,5 +141,48 @@ function actualizarNavbar() {
         avatarLinks.forEach(link => {
             link.href = '/perfil-tienda.html';
         });
+
+        // Agregar el menú de opciones '+' para el rol Tienda
+        const navRightElements = document.querySelectorAll('.nav-right');
+        navRightElements.forEach(navRight => {
+            // Prevenir duplicados si se llama a actualizarNavbar varias veces
+            if (navRight.querySelector('.tienda-options-menu')) return;
+            
+            const tiendaMenu = document.createElement('div');
+            tiendaMenu.className = 'tienda-options-menu';
+            tiendaMenu.innerHTML = `
+                <button class="tienda-options-btn" id="btn-tienda-options" title="Opciones de Tienda">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </button>
+                <div class="tienda-dropdown" style="display: none;">
+                    <a href="gestionar-productos.html?action=new">Agregar producto</a>
+                    <a href="gestionar-productos.html">Gestionar productos</a>
+                </div>
+            `;
+            
+            // Insertar antes del avatar, o al inicio de nav-right
+            const avatarLink = navRight.querySelector('.nav-avatar-link') || navRight.querySelector('.user-avatar-small');
+            if (avatarLink) {
+                navRight.insertBefore(tiendaMenu, avatarLink);
+            } else {
+                navRight.appendChild(tiendaMenu);
+            }
+
+            // Lógica para mostrar/ocultar el menú
+            const btn = tiendaMenu.querySelector('#btn-tienda-options');
+            const dropdown = tiendaMenu.querySelector('.tienda-dropdown');
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.style.display = dropdown.style.display === 'none' ? 'flex' : 'none';
+            });
+            
+            // Cerrar al hacer clic fuera
+            document.addEventListener('click', () => {
+                dropdown.style.display = 'none';
+            });
+        });
     }
 }
