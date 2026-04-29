@@ -68,7 +68,7 @@ app.listen(PORT, () => {
     console.log('');
     console.log('  ╔═══════════════════════════════════════╗');
     console.log('  ║          MediApp Server               ║');
-    console.log(`  ║   http://localhost:${PORT}            ║`);
+    console.log(`  ║   http://localhost:${PORT}                 ║`);
     console.log('  ║   API: /api/...                       ║');
     console.log('  ╚═══════════════════════════════════════╝');
     console.log('');

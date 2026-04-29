@@ -1,0 +1,15 @@
+{
+  "name": "mediapp",
+  "version": "1.0.0",
+  "description": "MediApp — Plataforma de productos medicinales",
+  "private": true,
+  "scripts": {
+    "dev": "cd backend && npm run dev",
+    "start": "cd backend && npm start",
+    "seed": "cd backend && npm run seed",
+    "install:backend": "cd backend && npm install"
+  },
+  "keywords": ["mediapp"],
+  "author": "",
+  "license": "ISC"
+}
