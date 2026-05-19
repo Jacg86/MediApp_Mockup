@@ -74,6 +74,14 @@ DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=tu_contraseña
 DB_NAME=mediapp
+
+# ── Google OAuth ──
+GOOGLE_CLIENT_ID=Tu_ID
+
+# ── Pasarela de Pagos (Stripe) ──
+STRIPE_PUBLISHABLE_KEY=pk
+STRIPE_SECRET_KEY=sk
+
 ```
 
 ### 4. Instalar dependencias del backend
@@ -114,10 +122,12 @@ MediApp/
 │   ├── config/
 │   │   └── db.js                 # Pool de conexiones PostgreSQL
 │   ├── controllers/
-│   │   ├── authController.js     # Login y registro
+│   │   ├── authController.js     # Login y registro (Google Auth)
 │   │   ├── productoController.js # CRUD productos
 │   │   ├── carritoController.js  # Gestión del carrito
 │   │   ├── pedidoController.js   # Gestión de pedidos
+│   │   ├── pagosController.js    # Pagos (Stripe y Efectivo)
+│   │   ├── pdfController.js      # Generación de comprobantes
 │   │   ├── usuarioController.js  # Perfil de usuario
 │   │   ├── tiendaController.js   # Perfil de tienda
 │   │   └── categoriaController.js # Listado de categorías
@@ -129,6 +139,9 @@ MediApp/
 │   │   ├── tiendaModel.js        # Queries de tiendas
 │   │   └── categoriaModel.js     # Queries de categorías
 │   ├── routes/                   # Definición de rutas HTTP
+│   │   ├── authRoutes.js         # Rutas de autenticación
+│   │   ├── pagosRoutes.js        # Rutas de pagos y facturas
+│   │   └── ...                   # Otras rutas
 │   ├── middleware/
 │   │   ├── authMiddleware.js     # Verificación JWT
 │   │   ├── errorHandler.js       # Manejo global de errores
@@ -153,6 +166,7 @@ MediApp/
 │   └── *.html                    # Páginas HTML
 ├── database/
 │   └── script.sql                # Script completo de la BD
+├── .gitignore                    # Archivos ignorados por Git
 └── README.md
 ```
 
