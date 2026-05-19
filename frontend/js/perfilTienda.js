@@ -109,6 +109,54 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ── Ventas de la Tienda ──────────────────────────────────────────
+    const ventasList = document.getElementById('ventas-list');
+    
+    async function cargarVentasTienda() {
+        if (!ventasList) return;
+        try {
+            const result = await API.get('/pedidos/tienda/ventas');
+            if (result.data.length === 0) {
+                ventasList.innerHTML = '<p style="color: #6b7280; font-size: 14px;">No tienes ventas pendientes de pago.</p>';
+                return;
+            }
+
+            let html = '';
+            result.data.forEach(v => {
+                html += `
+                    <div class="pedido-card" style="padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                            <strong>Pedido #${v.id_pedido}</strong>
+                            <span class="pedido-estado">${formatEstado(v.estado)}</span>
+                        </div>
+                        <p style="font-size: 13px; color: #4b5563; margin-bottom: 4px;">Comprador: ${v.nombre_comprador}</p>
+                        <p style="font-size: 13px; color: #4b5563; margin-bottom: 8px;">Monto: ${formatPrice(v.total)}</p>
+                        <div style="text-align: right;">
+                            <button class="btn-submit" style="width:auto; padding:6px 12px; font-size:12px;" onclick="aprobarPagoEfectivo(${v.id_pedido})">
+                                Confirmar Pago Recibido
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            ventasList.innerHTML = html;
+        } catch (error) {
+            ventasList.innerHTML = '<p style="color: #ef4444; font-size: 14px;">Error al cargar ventas.</p>';
+        }
+    }
+
+    window.aprobarPagoEfectivo = async function(id_pedido) {
+        if (!confirm('¿Confirmas que recibiste el dinero en efectivo para este pedido?')) return;
+        try {
+            await API.put('/pagos/' + id_pedido + '/aprobar-efectivo');
+            showToast('Pago confirmado exitosamente.', 'success');
+            cargarVentasTienda();
+        } catch (error) {
+            showToast(error.message || 'Error al confirmar el pago.', 'error');
+        }
+    };
+
     // ── Inicializar ──────────────────────────────────────────────
     cargarTienda();
+    cargarVentasTienda();
 });

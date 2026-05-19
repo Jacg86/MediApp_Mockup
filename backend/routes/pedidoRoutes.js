@@ -17,6 +17,9 @@ router.post('/', pedidoRules, handleValidation, PedidoController.crear);
 // GET /api/pedidos — listar mis pedidos
 router.get('/', PedidoController.listar);
 
+// GET /api/pedidos/tienda/ventas - listar ventas de la tienda
+router.get('/tienda/ventas', PedidoController.listarPorTienda);
+
 // GET /api/pedidos/:id — detalle de un pedido
 router.get('/:id', PedidoController.detalle);
 

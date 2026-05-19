@@ -21,6 +21,7 @@ const usuarioRoutes = require('./routes/usuarioRoutes');
 const tiendaRoutes = require('./routes/tiendaRoutes');
 const categoriaRoutes = require('./routes/categoriaRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const pagosRoutes = require('./routes/pagosRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -43,6 +44,7 @@ app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/tiendas', tiendaRoutes);
 app.use('/api/categorias', categoriaRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/pagos', pagosRoutes);
 
 // ── Ruta de salud ────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {

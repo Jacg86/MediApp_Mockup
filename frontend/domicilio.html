@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://js.stripe.com/v3/"></script>
 </head>
 
 <body class="home-body">
@@ -54,8 +55,31 @@
                 <input type="text" id="delivery-phone" placeholder="3001234567">
             </div>
 
-            <div class="card-actions">
-                <button type="submit" class="btn-submit" style="width:auto;padding:0 40px;">
+            <!-- Selección de Método de Pago -->
+            <div class="form-group" style="margin-top: 24px;">
+                <label>Método de Pago</label>
+                <div style="display: flex; gap: 20px; margin-top: 10px;">
+                    <label class="radio-container" style="display: flex; align-items: center; gap: 8px;">
+                        <input type="radio" name="payment_method" value="efectivo" checked>
+                        Efectivo contra entrega
+                    </label>
+                    <label class="radio-container" style="display: flex; align-items: center; gap: 8px;">
+                        <input type="radio" name="payment_method" value="tarjeta">
+                        Tarjeta / Stripe
+                    </label>
+                </div>
+            </div>
+
+            <!-- Contenedor de Stripe (oculto por defecto) -->
+            <div id="stripe-container" style="display: none; margin-top: 16px; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fafafa;">
+                <div id="card-element">
+                    <!-- Stripe inyectará el iframe del input aquí -->
+                </div>
+                <div id="card-errors" role="alert" style="color: #ef4444; font-size: 13px; margin-top: 8px;"></div>
+            </div>
+
+            <div class="card-actions" style="margin-top: 32px;">
+                <button type="submit" class="btn-submit" id="btn-confirmar-pedido" style="width:100%;padding:0 40px;">
                     Confirmar pedido
                 </button>
             </div>

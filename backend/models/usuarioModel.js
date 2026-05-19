@@ -37,12 +37,12 @@ const UsuarioModel = {
     /**
      * Crear un nuevo usuario
      */
-    async create({ nombre, correo, contrasena, id_rol, ciudad, telefono }) {
+    async create({ nombre, correo, contrasena, id_rol, ciudad, telefono, proveedor_login = 'local' }) {
         const result = await query(
-            `INSERT INTO usuarios (nombre, correo, contrasena, id_rol, ciudad, telefono)
-             VALUES ($1, $2, $3, $4, $5, $6)
-             RETURNING id_usuario, nombre, correo, id_rol, ciudad, telefono, created_at`,
-            [nombre, correo, contrasena, id_rol, ciudad, telefono]
+            `INSERT INTO usuarios (nombre, correo, contrasena, id_rol, ciudad, telefono, proveedor_login)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             RETURNING id_usuario, nombre, correo, id_rol, ciudad, telefono, proveedor_login, created_at`,
+            [nombre, correo, contrasena, id_rol, ciudad, telefono, proveedor_login]
         );
         return result.rows[0];
     },
@@ -70,6 +70,17 @@ const UsuarioModel = {
         const result = await query(
             `UPDATE usuarios SET contrasena = $2 WHERE id_usuario = $1 AND activo = TRUE`,
             [id, hashedPassword]
+        );
+        return result.rowCount > 0;
+    },
+
+    /**
+     * Actualizar proveedor de login
+     */
+    async updateProvider(id, proveedor) {
+        const result = await query(
+            `UPDATE usuarios SET proveedor_login = $2 WHERE id_usuario = $1`,
+            [id, proveedor]
         );
         return result.rowCount > 0;
     },

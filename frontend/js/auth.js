@@ -62,3 +62,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// ── Google Auth Callback ─────────────────────────────────────────
+async function handleGoogleCredentialResponse(response) {
+    if (!response.credential) {
+        showToast('Error al iniciar sesión con Google', 'error');
+        return;
+    }
+
+    try {
+        const result = await API.post('/auth/google', { credential: response.credential });
+
+        guardarSesion(result.data.token, result.data.usuario);
+        showToast('¡Bienvenido, ' + result.data.usuario.nombre + '!');
+
+        setTimeout(() => {
+            if (result.data.usuario.nombre_rol === 'Usuario' || parseInt(result.data.usuario.id_rol) === 1) {
+                window.location.href = '/admin.html';
+            } else {
+                window.location.href = '/home.html';
+            }
+        }, 800);
+
+    } catch (error) {
+        showToast(error.message || 'Error en autenticación con Google', 'error');
+    }
+}

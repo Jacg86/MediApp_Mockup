@@ -5,7 +5,44 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!requiereAuth()) return;
     actualizarNavbar();
 
-    // ── Formulario de domicilio (crear pedido) ───────────────────
+    // ── Stripe Config ──────────────────────────────────────────────
+    let stripe, elements, cardElement;
+    
+    // Asumiendo que la llave se puede obtener o la ponemos estática si es de prueba.
+    // Usaremos una llave de prueba pública ficticia para la maqueta, pero en real vendría del servidor o enviroment.
+    const STRIPE_PUBLIC_KEY = 'pk_test_tu_clave_publica_aqui';
+    
+    if (window.Stripe) {
+        stripe = Stripe(STRIPE_PUBLIC_KEY);
+        elements = stripe.elements();
+        cardElement = elements.create('card');
+        
+        const cardContainer = document.getElementById('card-element');
+        if (cardContainer) {
+            cardElement.mount('#card-element');
+            
+            cardElement.on('change', function(event) {
+                const displayError = document.getElementById('card-errors');
+                if (event.error) {
+                    displayError.textContent = event.error.message;
+                } else {
+                    displayError.textContent = '';
+                }
+            });
+        }
+    }
+
+    // Toggle de UI para métodos de pago
+    const radioEfectivo = document.querySelector('input[name="payment_method"][value="efectivo"]');
+    const radioTarjeta = document.querySelector('input[name="payment_method"][value="tarjeta"]');
+    const stripeContainer = document.getElementById('stripe-container');
+
+    if (radioEfectivo && radioTarjeta && stripeContainer) {
+        radioEfectivo.addEventListener('change', () => { stripeContainer.style.display = 'none'; });
+        radioTarjeta.addEventListener('change', () => { stripeContainer.style.display = 'block'; });
+    }
+
+    // ── Formulario de domicilio (crear pedido y pagar) ──────────────
     const pedidoForm = document.getElementById('pedido-form');
     if (pedidoForm) {
         pedidoForm.addEventListener('submit', async (e) => {
@@ -14,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const direccion = document.getElementById('delivery-address').value.trim();
             const ciudad = document.getElementById('delivery-city').value.trim();
             const telefono = document.getElementById('delivery-phone').value.trim();
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
             if (!direccion || !ciudad) {
                 showToast('La dirección y ciudad son obligatorias.', 'error');
@@ -22,23 +60,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const btnConfirm = pedidoForm.querySelector('.btn-submit');
             btnConfirm.disabled = true;
-            btnConfirm.textContent = 'Procesando pedido...';
+            btnConfirm.textContent = 'Procesando...';
 
             try {
+                // 1. Crear el Pedido
                 const result = await API.post('/pedidos', {
                     metodo_entrega: 'domicilio_express',
                     direccion_entrega: `${direccion}, ${ciudad}`,
                     notas: telefono ? `Tel: ${telefono}` : null,
                 });
 
-                showToast('¡Pedido creado exitosamente!');
+                const id_pedido = result.data.id_pedido;
 
-                setTimeout(() => {
-                    window.location.href = '/pedidos.html';
-                }, 1200);
+                // 2. Procesar Pago
+                if (paymentMethod === 'efectivo') {
+                    await API.post('/pagos/confirmar-efectivo', { id_pedido });
+                    showToast('¡Pedido creado! Pago contra entrega.');
+                    setTimeout(() => window.location.href = '/pedidos.html', 1500);
+
+                } else if (paymentMethod === 'tarjeta') {
+                    // a) Obtener Intent de Stripe
+                    const intentRes = await API.post('/pagos/crear-intencion', { id_pedido });
+                    const clientSecret = intentRes.clientSecret;
+
+                    // b) Confirmar en el frontend con Stripe
+                    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                        payment_method: {
+                            card: cardElement,
+                            billing_details: {
+                                address: {
+                                    line1: direccion,
+                                    city: ciudad
+                                }
+                            }
+                        }
+                    });
+
+                    if (error) {
+                        document.getElementById('card-errors').textContent = error.message;
+                        showToast(error.message, 'error');
+                        btnConfirm.disabled = false;
+                        btnConfirm.textContent = 'Confirmar pedido';
+                        return;
+                    }
+
+                    if (paymentIntent.status === 'succeeded') {
+                        // c) Notificar al backend del éxito
+                        await API.post('/pagos/confirmar-tarjeta', { 
+                            id_pedido, 
+                            paymentIntentId: paymentIntent.id 
+                        });
+                        showToast('¡Pago con tarjeta exitoso!');
+                        setTimeout(() => window.location.href = '/pedidos.html', 1500);
+                    }
+                }
 
             } catch (error) {
-                showToast(error.message || 'Error al crear el pedido.', 'error');
+                showToast(error.message || 'Error al procesar el pedido o el pago.', 'error');
                 btnConfirm.disabled = false;
                 btnConfirm.textContent = 'Confirmar pedido';
             }
@@ -88,6 +166,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="pedido-metodo">${pedido.metodo_entrega === 'domicilio_express' ? '🏍️ Domicilio Express' : pedido.metodo_entrega === 'programado' ? '📅 Programado' : '🏪 Retiro en tienda'}</span>
                             <span class="pedido-total">Total: ${formatPrice(pedido.total)}</span>
                         </div>
+                        ${pedido.estado === 'pagado' ? `
+                        <div style="margin-top: 12px; border-top: 1px dashed #e5e7eb; padding-top: 12px; text-align: right;">
+                            <a href="/api/pagos/comprobante/${pedido.id_pedido}?token=${obtenerToken()}" target="_blank" class="btn-submit" style="background:var(--primary);color:var(--text-dark);padding:6px 12px;font-size:12px;width:auto;display:inline-block;text-decoration:none;">
+                                📄 Descargar Comprobante
+                            </a>
+                        </div>
+                        ` : ''}
                     </div>
                 `;
             });

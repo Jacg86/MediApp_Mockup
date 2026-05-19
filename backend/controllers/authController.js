@@ -4,8 +4,11 @@
 // ================================================================
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 const UsuarioModel = require('../models/usuarioModel');
 const TiendaModel = require('../models/tiendaModel');
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const AuthController = {
     /**
@@ -22,6 +25,13 @@ const AuthController = {
                 return res.status(401).json({
                     success: false,
                     message: 'Correo o contraseña incorrectos.',
+                });
+            }
+
+            if (usuario.proveedor_login === 'google') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Esta cuenta fue creada con Google. Usa "Continuar con Google".',
                 });
             }
 
@@ -74,6 +84,10 @@ const AuthController = {
     async registro(req, res, next) {
         try {
             const { nombre, correo, contrasena, ciudad, telefono, tipo } = req.body;
+
+            if (!contrasena) {
+                return res.status(400).json({ success: false, message: 'La contraseña es obligatoria.' });
+            }
 
             // Verificar que el correo no esté en uso
             const existente = await UsuarioModel.findByEmail(correo);
@@ -173,6 +187,81 @@ const AuthController = {
                 data: {
                     usuario,
                     tienda: tienda || undefined,
+                },
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    /**
+     * POST /api/auth/google
+     * Login / Registro automático con Google
+     */
+    async googleAuth(req, res, next) {
+        try {
+            const { credential } = req.body;
+            
+            // Verificar token con Google
+            const ticket = await googleClient.verifyIdToken({
+                idToken: credential,
+                audience: process.env.GOOGLE_CLIENT_ID,
+            });
+            const payloadGoogle = ticket.getPayload();
+            
+            const { email, name, picture } = payloadGoogle;
+
+            // Verificar si el correo ya existe
+            let usuario = await UsuarioModel.findByEmail(email);
+
+            if (!usuario) {
+                // Registro automático como Consumidor
+                usuario = await UsuarioModel.create({
+                    nombre: name,
+                    correo: email,
+                    contrasena: null,
+                    id_rol: 2, // 2 = Consumidor
+                    ciudad: null,
+                    telefono: null,
+                    proveedor_login: 'google'
+                });
+                
+                // Cargar datos de la BD para tener todos los campos (como nombre_rol)
+                usuario = await UsuarioModel.findByEmail(email);
+            } else if (usuario.proveedor_login !== 'google') {
+                // Actualizar proveedor si era local pero ahora entra con Google
+                // Dependiendo de las reglas, podrías bloquearlo o fusionar la cuenta.
+                // Lo fusionaremos para mayor comodidad.
+                await UsuarioModel.updateProvider(usuario.id_usuario, 'google');
+                usuario.proveedor_login = 'google';
+            }
+
+            // Generar JWT
+            const payload = {
+                id_usuario: usuario.id_usuario,
+                correo: usuario.correo,
+                nombre: usuario.nombre,
+                id_rol: usuario.id_rol,
+                nombre_rol: usuario.nombre_rol,
+            };
+
+            const token = jwt.sign(payload, process.env.JWT_SECRET, {
+                expiresIn: process.env.JWT_EXPIRES_IN || '24h',
+            });
+
+            res.json({
+                success: true,
+                message: 'Autenticado con Google exitosamente.',
+                data: {
+                    token,
+                    usuario: {
+                        id_usuario: usuario.id_usuario,
+                        nombre: usuario.nombre,
+                        correo: usuario.correo,
+                        nombre_rol: usuario.nombre_rol,
+                        ciudad: usuario.ciudad,
+                    },
                 },
             });
 

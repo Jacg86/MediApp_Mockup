@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
 <body>
@@ -61,7 +62,29 @@
 
                     <button type="submit" class="btn-submit" id="btn-login">Iniciar sesión</button>
 
-                    <div class="signup-link">
+                    <div class="divider">
+                        <span>o</span>
+                    </div>
+
+                    <div id="g_id_onload"
+                        data-client_id="1073850971771-b3csv2crf6ovsr496rqh1ra9qc9viiu3.apps.googleusercontent.com"
+                        data-context="signin"
+                        data-ux_mode="popup"
+                        data-callback="handleGoogleCredentialResponse"
+                        data-auto_prompt="false">
+                    </div>
+
+                    <div class="g_id_signin"
+                        data-type="standard"
+                        data-shape="rectangular"
+                        data-theme="outline"
+                        data-text="continue_with"
+                        data-size="large"
+                        data-logo_alignment="left"
+                        data-width="100%">
+                    </div>
+
+                    <div class="signup-link" style="margin-top: 24px;">
                         ¿No tienes una cuenta? <a href="registro.html">Crear una cuenta nueva</a>
                     </div>
 

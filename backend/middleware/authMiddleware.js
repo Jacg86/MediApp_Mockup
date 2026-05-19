@@ -9,15 +9,20 @@ const jwt = require('jsonwebtoken');
  */
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers.authorization;
+    let token = null;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+    } else if (req.query.token) {
+        token = req.query.token;
+    }
+
+    if (!token) {
         return res.status(401).json({
             success: false,
             message: 'Acceso denegado. No se proporcionó un token de autenticación.',
         });
     }
-
-    const token = authHeader.split(' ')[1];
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);

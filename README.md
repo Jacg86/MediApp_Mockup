@@ -25,8 +25,8 @@ Plataforma web para la venta de productos farmacéuticos cercanos a su fecha de 
 └──────────────┘                   └──────────────────┘             └──────────────┘
 ```
 
-- **Frontend**: HTML5, CSS3, JavaScript Vanilla — consume la API REST
-- **Backend**: Node.js + Express — patrón MVC (Models, Controllers, Routes)
+- **Frontend**: HTML5, CSS3, JavaScript Vanilla, Stripe Elements — consume la API REST
+- **Backend**: Node.js + Express + Google Auth Library + Stripe SDK + PDFKit — patrón MVC (Models, Controllers, Routes)
 - **Base de datos**: PostgreSQL 14+ — 10 tablas, vistas, triggers, índices
 - **Autenticación**: JWT (JSON Web Tokens)
 
@@ -180,6 +180,13 @@ MediApp/
 | PUT | `/api/usuarios/perfil` | Actualizar perfil | ✅ |
 | PUT | `/api/usuarios/password` | Cambiar contraseña | ✅ |
 | GET | `/api/categorias` | Listar categorías | ❌ |
+| POST | `/api/auth/google` | Login/Registro con Google | ❌ |
+| POST | `/api/pagos/crear-intencion` | Crear PaymentIntent de Stripe | ✅ |
+| POST | `/api/pagos/confirmar-tarjeta` | Confirmar pago con Stripe | ✅ |
+| POST | `/api/pagos/confirmar-efectivo` | Confirmar pedido en efectivo | ✅ |
+| GET | `/api/pagos/comprobante/:id` | Descargar PDF del comprobante | ✅ |
+| PUT | `/api/pagos/:id/aprobar-efectivo` | Aprobar efectivo (Tienda) | ✅ Tienda |
+| GET | `/api/pedidos/tienda/ventas` | Ver ventas pendientes | ✅ Tienda |
 
 ---
 
@@ -204,14 +211,16 @@ Todos usan la contraseña: **`mediapp123`**
 - Explorar catálogo con filtros (categoría, ciudad, búsqueda)
 - Ver detalle de productos
 - Agregar/quitar productos del carrito
-- Crear pedidos con dirección de entrega
-- Ver historial de pedidos
+- Crear pedidos con dirección de entrega y selección de método de pago (Tarjeta o Efectivo)
+- Pago seguro en línea con **Stripe Elements**
+- Ver historial de pedidos y descargar **Comprobantes en PDF**
 - Editar perfil y cambiar contraseña
 
 ### Para Tiendas
 - Registro como tienda (con NIT)
 - Gestionar perfil del negocio
 - Crear, editar y eliminar publicaciones de productos (CRUD)
+- **Ventas**: Aprobar o rechazar ventas con pago contra entrega en efectivo.
 - **Seguridad**: Bloqueo estricto para no permitir publicar medicamentos con vencimiento menor a 20 días
 - Subir **imágenes reales** para los productos
 - Cambiar contraseña

@@ -115,6 +115,45 @@ const PedidoController = {
             next(error);
         }
     },
+
+    /**
+     * GET /api/pedidos/tienda/ventas
+     * Listar ventas (pedidos) de una tienda (simplificado para el mockup)
+     */
+    async listarPorTienda(req, res, next) {
+        try {
+            // Para el mockup, simulamos obtener todos los pedidos que tienen items de esta tienda.
+            // Para no complicar la consulta SQL de "qué items pertenecen a qué tienda", 
+            // y como es un demo, listaremos los que están 'pendiente_confirmacion_pago' en general.
+            // En una app real cruzaríamos item_pedido con producto y tienda.
+            
+            const { query } = require('../config/db');
+            
+            // Obtener el ID de la tienda del usuario
+            const tiendaRes = await query(`SELECT id_tienda FROM tiendas WHERE id_usuario = $1`, [req.usuario.id_usuario]);
+            if (tiendaRes.rows.length === 0) {
+                return res.status(404).json({ success: false, message: 'No tienes una tienda registrada.' });
+            }
+
+            // Seleccionamos los pedidos pendientes de pago
+            const result = await query(`
+                SELECT p.id_pedido, p.estado, p.metodo_entrega, p.total, p.created_at, 
+                       u.nombre as nombre_comprador, p.direccion_entrega
+                FROM pedido p
+                JOIN usuarios u ON p.id_usuario = u.id_usuario
+                WHERE p.estado = 'pendiente_confirmacion_pago'
+                ORDER BY p.created_at DESC
+            `);
+
+            res.json({
+                success: true,
+                data: result.rows,
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    },
 };
 
 module.exports = PedidoController;

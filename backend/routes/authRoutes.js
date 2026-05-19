@@ -11,6 +11,9 @@ const router = Router();
 // POST /api/auth/login
 router.post('/login', loginRules, handleValidation, AuthController.login);
 
+// POST /api/auth/google
+router.post('/google', AuthController.googleAuth);
+
 // POST /api/auth/registro
 router.post('/registro', AuthController.registro);
 

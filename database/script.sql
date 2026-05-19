@@ -18,7 +18,9 @@ DO $$ BEGIN
             'confirmado',
             'en_camino',
             'entregado',
-            'cancelado'
+            'cancelado',
+            'pendiente_confirmacion_pago',
+            'pagado'
         );
     END IF;
 END $$;
@@ -51,7 +53,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     id_usuario SERIAL PRIMARY KEY,
     nombre VARCHAR(120) NOT NULL,
     correo VARCHAR(255) NOT NULL,
-    contrasena VARCHAR(255) NOT NULL,
+    contrasena VARCHAR(255),
+    proveedor_login VARCHAR(20) DEFAULT 'local',
     id_rol INT NOT NULL,
     ciudad VARCHAR(100),
     telefono VARCHAR(20),
@@ -187,7 +190,21 @@ CREATE TABLE IF NOT EXISTS pedido (
 );
 
 -- ================================================================
---  10. ITEM_PEDIDO
+--  10. PAGOS
+-- ================================================================
+CREATE TABLE IF NOT EXISTS pagos (
+    id_pago SERIAL PRIMARY KEY,
+    id_pedido INT NOT NULL,
+    metodo_pago VARCHAR(50) NOT NULL,
+    estado_pago VARCHAR(50) NOT NULL,
+    referencia_transaccion VARCHAR(255),
+    monto NUMERIC(12,2) NOT NULL,
+    fecha_pago TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_pagos_pedido FOREIGN KEY (id_pedido) REFERENCES pedido(id_pedido) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- ================================================================
+--  11. ITEM_PEDIDO
 -- ================================================================
 CREATE TABLE IF NOT EXISTS item_pedido (
     id_item SERIAL PRIMARY KEY,
