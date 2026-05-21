@@ -108,7 +108,6 @@ const PagosController = {
         try {
             const { id_pedido } = req.params;
             
-            // En un caso real más complejo verificaríamos que la tienda sea la dueña de los productos de este pedido.
             // Por simplicidad para este mockup:
             await query(`UPDATE pedido SET estado = 'pagado' WHERE id_pedido = $1`, [id_pedido]);
             await query(`UPDATE pagos SET estado_pago = 'exitoso' WHERE id_pedido = $1 AND metodo_pago = 'efectivo'`, [id_pedido]);
