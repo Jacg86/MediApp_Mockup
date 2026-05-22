@@ -110,6 +110,10 @@ function obtenerUsuario() {
     return data ? JSON.parse(data) : null;
 }
 
+function obtenerToken() {
+    return localStorage.getItem('mediapp_token');
+}
+
 function cerrarSesion() {
     localStorage.removeItem('mediapp_token');
     localStorage.removeItem('mediapp_usuario');
