@@ -1609,6 +1609,14 @@ body {
     color: var(--text-muted);
     font-weight: 500;
     margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.cart-item-store svg {
+    width: 14px !important;
+    height: 14px !important;
+    flex-shrink: 0;
 }
 .cart-item-price {
     font-size: 16px;
