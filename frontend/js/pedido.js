@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let stripe, elements, cardElement;
     
     // Llave pública de Stripe para inicializar el formulario de tarjeta
-    const STRIPE_PUBLIC_KEY = 'pk_test_51TYuFUJr2KAWvDFi9mTeWNzREKIial2Gt0CM83nQo4VNH0PQETWjp8BEDIn30QQnrmH2CVCdITi9Ebp';
+    const STRIPE_PUBLIC_KEY = 'pk_test_51TYuFUJr2KAWvDFi9mTeWNzREKIial2Gt0CM83nQo4VNH0PQETWjp8BEDIn30QQnrmH2CVCdITi9EbpAjzhV2RCW00kPXVVf2K';
     
     if (window.Stripe) {
         stripe = Stripe(STRIPE_PUBLIC_KEY);
