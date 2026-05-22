@@ -8,9 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Stripe Config ──────────────────────────────────────────────
     let stripe, elements, cardElement;
     
-    // Asumiendo que la llave se puede obtener o la ponemos estática si es de prueba.
-    // Usaremos una llave de prueba pública ficticia para la maqueta, pero en real vendría del servidor o enviroment.
-    const STRIPE_PUBLIC_KEY = 'pk_test_tu_clave_publica_aqui';
+    // Llave pública de Stripe para inicializar el formulario de tarjeta
+    const STRIPE_PUBLIC_KEY = 'pk_test_51TYuFUJr2KAWvDFi9mTeWNzREKIial2Gt0CM83nQo4VNH0PQETWjp8BEDIn30QQnrmH2CVCdITi9Ebp';
     
     if (window.Stripe) {
         stripe = Stripe(STRIPE_PUBLIC_KEY);
